@@ -19,7 +19,7 @@ public class PR32CreateMain {
         ArrayList<String> documents = new ArrayList<>();
         
         //Afegir els arxius que volem
-        documents.add("/data/input/example.xml");
+        documents.add(System.getProperty("user.dir") +"/data/input/info.xml");
 
         //Inserir
         for (String s : documents) {

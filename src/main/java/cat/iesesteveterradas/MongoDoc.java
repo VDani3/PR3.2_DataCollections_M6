@@ -6,20 +6,20 @@ public class MongoDoc {
 
     public MongoDoc(String id, String postTypeId, String acceptedAnswerId, String cDate, String score, String viewCount, String body, String ownerUserId, String lastDate, String title, String tags, String ansCount, String comCount, String license) {
 
-        question = new Document("Id", id)
-                        .append("PostTypeId", postTypeId)
-                        .append("AcceptedAnswerId", acceptedAnswerId)
-                        .append("CreationDate", cDate)
-                        .append("Score", score)
-                        .append("ViewCount", viewCount)
-                        .append("Body", body)
-                        .append("OwnerUserId", ownerUserId)
-                        .append("LastActivityDate", lastDate)
-                        .append("Title", title)
-                        .append("Tags", tags)
-                        .append("AnswerCount", ansCount)
-                        .append("CommentCount", comCount)
-                        .append("ContentLicense", license);
+        question = new Document("id", id)
+                        .append("postTypeId", postTypeId)
+                        .append("acceptedAnswerId", acceptedAnswerId)
+                        .append("creationDate", cDate)
+                        .append("score", score)
+                        .append("viewCount", viewCount)
+                        .append("body", body)
+                        .append("ownerUserId", ownerUserId)
+                        .append("lastActivityDate", lastDate)
+                        .append("title", title)
+                        .append("tags", tags)
+                        .append("answerCount", ansCount)
+                        .append("commentCount", comCount)
+                        .append("contentLicense", license);
 
     }
 

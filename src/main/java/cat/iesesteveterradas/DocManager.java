@@ -37,20 +37,20 @@ public class DocManager {
         try {
             org.w3c.dom.Document doc = getDocument(url);
             //Obtindre dades
-            String id = doc.getElementsByTagName("Id").item(0).getTextContent();   
-            String postTpeId = doc.getElementsByTagName("PostTypeId").item(0).getTextContent();   
-            String acceptedAnswerId = doc.getElementsByTagName("AcceptedAnswerId").item(0).getTextContent();   
-            String cDate = doc.getElementsByTagName("CreationDate").item(0).getTextContent();   
-            String score = doc.getElementsByTagName("Score").item(0).getTextContent();   
-            String viewCount = doc.getElementsByTagName("ViewCount").item(0).getTextContent();   
-            String body = StringEscapeUtils.unescapeHtml4(doc.getElementsByTagName("Body").item(0).getTextContent());   //Aqui modifiquem el String
-            String ownerUserId = doc.getElementsByTagName("OwnerUserId").item(0).getTextContent();   
-            String lastDate = doc.getElementsByTagName("LastActivityDate").item(0).getTextContent();   
-            String title = doc.getElementsByTagName("Title").item(0).getTextContent();   
-            String tags = doc.getElementsByTagName("Tags").item(0).getTextContent();   
-            String ansCount = doc.getElementsByTagName("AnswerCount").item(0).getTextContent();   
-            String comCount = doc.getElementsByTagName("CommentCount").item(0).getTextContent();   
-            String license = doc.getElementsByTagName("ContentLicense").item(0).getTextContent();   
+            String id = doc.getElementsByTagName("id").item(0).getTextContent();   
+            String postTpeId = doc.getElementsByTagName("posttypeid").item(0).getTextContent();   
+            String acceptedAnswerId = doc.getElementsByTagName("acceptedanswerid").item(0).getTextContent();   
+            String cDate = doc.getElementsByTagName("creationdate").item(0).getTextContent();   
+            String score = doc.getElementsByTagName("score").item(0).getTextContent();   
+            String viewCount = doc.getElementsByTagName("viewcount").item(0).getTextContent();   
+            String body = StringEscapeUtils.unescapeHtml4(doc.getElementsByTagName("body").item(0).getTextContent());   //Aqui modifiquem el String
+            String ownerUserId = doc.getElementsByTagName("owneruserid").item(0).getTextContent();   
+            String lastDate = doc.getElementsByTagName("lastactivitydate").item(0).getTextContent();   
+            String title = doc.getElementsByTagName("title").item(0).getTextContent();   
+            String tags = doc.getElementsByTagName("tags").item(0).getTextContent();   
+            String ansCount = doc.getElementsByTagName("answercount").item(0).getTextContent();   
+            String comCount = doc.getElementsByTagName("commentcount").item(0).getTextContent();   
+            String license = doc.getElementsByTagName("contentlicense").item(0).getTextContent();   
             
             resultado = new MongoDoc(postTpeId, id, acceptedAnswerId, cDate, score, viewCount, body, ownerUserId, lastDate, title, tags, ansCount, comCount, license);
 
@@ -81,3 +81,31 @@ public class DocManager {
         return null;
     }
 }
+
+/*
+ * declare option output:method "xml";
+declare option output:indent "yes";
+
+<posts>{
+  for $p in /posts/row[@PostTypeId='1']
+  let $viewCount := xs:integer($p/@ViewCount)
+  order by $viewCount descending
+  return 
+    <post>
+      <id>{$p/@Id/string()}</id>
+      <posttypeid>{$p/@Id/string()}</posttypeid>
+      <acceptedanswerid>{$p/@Id/string()}</acceptedanswerid>
+      <creationdate></creationdate>
+      <score></score>
+      <viewcount></viewcount>
+      <body></body>
+      <owneruserid></owneruserid>
+      <lastactivitydate></lastactivitydate>
+      <title></title>
+      <tags></tags>
+      <answercount></answercount>
+      <commentcount></commentcount>
+      <contentlicense></contentlicense>
+    </post>
+}</posts>
+ */
