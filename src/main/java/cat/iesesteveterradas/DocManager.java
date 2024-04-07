@@ -1,6 +1,9 @@
 package cat.iesesteveterradas;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -11,6 +14,9 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.apache.commons.text.StringEscapeUtils;
 
 public class DocManager {
@@ -33,24 +39,57 @@ public class DocManager {
 
     public MongoDoc xmlToMongoDoc(String url) {     //Llegir dades
         MongoDoc resultado;
+        List<String> attributes = new ArrayList<>();
         //Vamo a leer 
         try {
-            org.w3c.dom.Document doc = getDocument(url);
+            // Parse the XML file
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            org.w3c.dom.Document doc = dBuilder.parse(url);
+
+            // Normalize the XML structure
+            doc.getDocumentElement().normalize();
+
+            // Get all 'post' nodes
+            NodeList postList = doc.getElementsByTagName("post");
+
+            for (int temp = 0; temp < postList.getLength(); temp++) {
+                Node postNode = postList.item(temp);
+
+                if (postNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element postElement = (Element) postNode;
+
+                    // Get all 'field' nodes within this 'post'
+                    NodeList fieldList = postElement.getChildNodes();
+
+                    for (int count = 0; count < fieldList.getLength(); count++) {
+                        Node fieldNode = fieldList.item(count);
+
+                        if (fieldNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element fieldElement = (Element) fieldNode;
+
+                            // Get the 'name' and 'value' attributes of the 'field'
+                            attributes.add(fieldElement.getTextContent());
+                        }
+                    }
+                }
+            }
+            
             //Obtindre dades
-            String id = doc.getElementsByTagName("id").item(0).getTextContent();   
-            String postTpeId = doc.getElementsByTagName("posttypeid").item(0).getTextContent();   
-            String acceptedAnswerId = doc.getElementsByTagName("acceptedanswerid").item(0).getTextContent();   
-            String cDate = doc.getElementsByTagName("creationdate").item(0).getTextContent();   
-            String score = doc.getElementsByTagName("score").item(0).getTextContent();   
-            String viewCount = doc.getElementsByTagName("viewcount").item(0).getTextContent();   
-            String body = StringEscapeUtils.unescapeHtml4(doc.getElementsByTagName("body").item(0).getTextContent());   //Aqui modifiquem el String
-            String ownerUserId = doc.getElementsByTagName("owneruserid").item(0).getTextContent();   
-            String lastDate = doc.getElementsByTagName("lastactivitydate").item(0).getTextContent();   
-            String title = doc.getElementsByTagName("title").item(0).getTextContent();   
-            String tags = doc.getElementsByTagName("tags").item(0).getTextContent();   
-            String ansCount = doc.getElementsByTagName("answercount").item(0).getTextContent();   
-            String comCount = doc.getElementsByTagName("commentcount").item(0).getTextContent();   
-            String license = doc.getElementsByTagName("contentlicense").item(0).getTextContent();   
+            String id = attributes.get(0);   
+            String postTpeId = attributes.get(1);   
+            String acceptedAnswerId = attributes.get(2);   
+            String cDate = attributes.get(3);   
+            String score = attributes.get(4);   
+            String viewCount = attributes.get(5);   
+            String body = StringEscapeUtils.unescapeHtml4(attributes.get(6));   //Aqui modifiquem el String
+            String ownerUserId = attributes.get(7);    
+            String lastDate = attributes.get(8);   
+            String title = attributes.get(9); 
+            String tags = attributes.get(10);    
+            String ansCount = attributes.get(11);  
+            String comCount = attributes.get(12);    
+            String license = attributes.get(13);   
             
             resultado = new MongoDoc(postTpeId, id, acceptedAnswerId, cDate, score, viewCount, body, ownerUserId, lastDate, title, tags, ansCount, comCount, license);
 
