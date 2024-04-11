@@ -21,14 +21,17 @@ import org.apache.commons.text.StringEscapeUtils;
 
 public class DocManager {
     
-    public void insertMongo(String url, String dbName, String collectionName, MongoDoc doc) {
+    public void insertMongo(String url, String dbName, String collectionName, List<MongoDoc> doc) {
         //Conectarse
         try (var mongoClient = MongoClients.create(url)) {
             MongoDatabase db = mongoClient.getDatabase(dbName);
             MongoCollection<Document> collection = db.getCollection(collectionName);
 
             //Insert
-            collection.insertOne(doc.getDocument());
+            for (MongoDoc mongoDoc : doc) {
+                collection.insertOne(mongoDoc.getDocument());
+            }
+            
             PR32CreateMain.logger.info("Inserted Correctly");
             System.out.println("Inserted Correctly");
         } catch (Exception e) {
@@ -37,9 +40,11 @@ public class DocManager {
         }
     }
 
-    public MongoDoc xmlToMongoDoc(String url) {     //Llegir dades
+    public List<MongoDoc> xmlToMongoDoc(String url) {     //Llegir dades
         MongoDoc resultado;
+        List<MongoDoc> listaRes = new ArrayList<MongoDoc>();
         List<String> attributes = new ArrayList<>();
+
         //Vamo a leer 
         try {
             // Parse the XML file
@@ -73,25 +78,27 @@ public class DocManager {
                         }
                     }
                 }
+
+                //Obtindre dades y crear un doc
+                String id = attributes.get(0);   
+                String postTpeId = attributes.get(1);   
+                String acceptedAnswerId = attributes.get(2);   
+                String cDate = attributes.get(3);   
+                String score = attributes.get(4);   
+                String viewCount = attributes.get(5);   
+                String body = StringEscapeUtils.unescapeHtml4(attributes.get(6));   //Aqui modifiquem el String
+                String ownerUserId = attributes.get(7);    
+                String lastDate = attributes.get(8);   
+                String title = attributes.get(9); 
+                String tags = attributes.get(10);    
+                String ansCount = attributes.get(11);  
+                String comCount = attributes.get(12);    
+                String license = attributes.get(13);   
+
+                resultado = new MongoDoc(postTpeId, id, acceptedAnswerId, cDate, score, viewCount, body, ownerUserId, lastDate, title, tags, ansCount, comCount, license);
+                listaRes.add(resultado);
+                attributes.clear();
             }
-            
-            //Obtindre dades
-            String id = attributes.get(0);   
-            String postTpeId = attributes.get(1);   
-            String acceptedAnswerId = attributes.get(2);   
-            String cDate = attributes.get(3);   
-            String score = attributes.get(4);   
-            String viewCount = attributes.get(5);   
-            String body = StringEscapeUtils.unescapeHtml4(attributes.get(6));   //Aqui modifiquem el String
-            String ownerUserId = attributes.get(7);    
-            String lastDate = attributes.get(8);   
-            String title = attributes.get(9); 
-            String tags = attributes.get(10);    
-            String ansCount = attributes.get(11);  
-            String comCount = attributes.get(12);    
-            String license = attributes.get(13);   
-            
-            resultado = new MongoDoc(postTpeId, id, acceptedAnswerId, cDate, score, viewCount, body, ownerUserId, lastDate, title, tags, ansCount, comCount, license);
 
             PR32CreateMain.logger.info("Read Correctly");
             System.out.println("Read Correctly");
@@ -100,7 +107,7 @@ public class DocManager {
             System.out.println("An error ocurred: " + e.getMessage());
             return null;
         }
-        return resultado;
+        return listaRes;
     }
 
     org.w3c.dom.Document getDocument(String url) {
@@ -121,30 +128,3 @@ public class DocManager {
     }
 }
 
-/*
- * declare option output:method "xml";
-declare option output:indent "yes";
-
-<posts>{
-  for $p in /posts/row[@PostTypeId='1']
-  let $viewCount := xs:integer($p/@ViewCount)
-  order by $viewCount descending
-  return 
-    <post>
-      <id>{$p/@Id/string()}</id>
-      <posttypeid>{$p/@Id/string()}</posttypeid>
-      <acceptedanswerid>{$p/@Id/string()}</acceptedanswerid>
-      <creationdate></creationdate>
-      <score></score>
-      <viewcount></viewcount>
-      <body></body>
-      <owneruserid></owneruserid>
-      <lastactivitydate></lastactivitydate>
-      <title></title>
-      <tags></tags>
-      <answercount></answercount>
-      <commentcount></commentcount>
-      <contentlicense></contentlicense>
-    </post>
-}</posts>
- */
