@@ -2,15 +2,17 @@ package cat.iesesteveterradas;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class PR32CreateMain {
-    public static final Logger logger = LoggerFactory.getLogger(PR32CreateMain.class);    
+    public static final Logger logger = Logger.getLogger(PR32CreateMain.class.getName());   
 
     public static void main(String[] args) throws IOException {
+
+        DocManager.setupLogger();
+       
         //Variables
         DocManager dm = new DocManager();
         String dbUrl = "mongodb://root:example@localhost:27017";

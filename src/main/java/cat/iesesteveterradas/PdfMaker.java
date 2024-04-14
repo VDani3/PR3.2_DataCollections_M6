@@ -6,51 +6,52 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class PdfMaker {
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
+public class PdfMaker {
     public static void generatePdf(List<String> lines, String outputPath) {
         try (PDDocument document = new PDDocument()) {
-            document.save(outputPath);
             PDPage page = new PDPage();
             document.addPage(page);
-            
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
-            contentStream.beginText();
-            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-            contentStream.setLeading(14.5f);
-            contentStream.newLineAtOffset(25, 725); // Adjusted for better alignment
             
-            int lineCount = 0;
+            // Load the font
+            File fontFile = new File(System.getProperty("user.dir") + "/data/NotoSans.ttf");
+            PDType0Font font = PDType0Font.load(document, fontFile);
+
+            contentStream.setFont(font, 12);
+            contentStream.setLeading(14.5f);
+
+            int yPos = 725; // Starting y position for the first line
             for (String line : lines) {
-                lineCount++;
-                contentStream.showText(line);
-                contentStream.newLine();
-                
-                // Adding a new page if needed
-                if (lineCount % 45 == 0) {
-                    contentStream.endText();
+                if (line.contains("\f")) {
+                    // Close the current stream and page
                     contentStream.close();
-                    
-                    if (lineCount < lines.size()) { // Check if there are more lines to add
-                        page = new PDPage();
-                        document.addPage(page);
-                        contentStream = new PDPageContentStream(document, page);
-                        contentStream.beginText();
-                        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                        contentStream.setLeading(14.5f);
-                        contentStream.newLineAtOffset(25, 725);
-                    }
+                    // Create a new page and reset the line counter
+                    page = new PDPage();
+                    document.addPage(page);
+                    contentStream = new PDPageContentStream(document, page);
+                    contentStream.setFont(font, 12);
+                    contentStream.setLeading(14.5f);
+                    yPos = 725; // Reset y position for the new page
+                    continue; // Skip processing for the form feed itself
+                }
+                
+                String[] splitLines = line.split("\n");
+                for (String splitLine : splitLines) {
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(25, yPos);
+                    contentStream.showText(splitLine);
+                    contentStream.endText();
+                    yPos -= 14.5f; // Move y position for the next line
                 }
             }
-            
-            if (contentStream != null) { // Ensure to close the text and content stream properly
-                contentStream.endText();
-                contentStream.close();
-            }
-            
+
+            contentStream.close();
             document.save(outputPath);
             System.out.println("PDF created at: " + outputPath);
         } catch (IOException e) {
@@ -58,3 +59,6 @@ public class PdfMaker {
         }
     }
 }
+
+
+

@@ -1,8 +1,13 @@
 package cat.iesesteveterradas;
 
 
+import java.io.IOException;
+import java.lang.System.Logger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.SimpleFormatter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +25,27 @@ import org.w3c.dom.NodeList;
 import org.apache.commons.text.StringEscapeUtils;
 
 public class DocManager {
+
+    public static void setupLogger() {
+        try {
+            FileHandler fileHandler = new FileHandler(System.getProperty("user.dir")+"/data/logs/PR32Query.log", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+
+            PR32QueryMain.logger.setLevel(Level.INFO);
+            PR32QueryMain.logger.addHandler(fileHandler);
+
+            FileHandler fileHandler2 = new FileHandler(System.getProperty("user.dir")+"/data/logs/PR32CreateMain.log", true);
+            fileHandler2.setFormatter(new SimpleFormatter());
+            PR32CreateMain.logger.setLevel(Level.INFO);
+            PR32CreateMain.logger.addHandler(fileHandler2);
+
+        } catch (SecurityException e) {
+            System.out.println("Security error");
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     public void insertMongo(String url, String dbName, String collectionName, List<MongoDoc> doc) {
         //Conectarse
@@ -33,9 +59,9 @@ public class DocManager {
             }
             
             PR32CreateMain.logger.info("Inserted Correctly");
-            System.out.println("Inserted Correctly");
+            System.out.println("\nInserted Correctly");
         } catch (Exception e) {
-            PR32CreateMain.logger.error("An error ocurred: " + e.getMessage());
+            PR32CreateMain.logger.warning("An error ocurred: " + e.getMessage());
             System.out.println("An error ocurred: " + e.getMessage());
         }
     }
@@ -78,7 +104,7 @@ public class DocManager {
                         }
                     }
                 }
-
+                
                 //Obtindre dades y crear un doc
                 String id = attributes.get(0);   
                 String postTpeId = attributes.get(1);   
@@ -95,7 +121,7 @@ public class DocManager {
                 String comCount = attributes.get(12);    
                 String license = attributes.get(13);   
 
-                resultado = new MongoDoc(postTpeId, id, acceptedAnswerId, cDate, score, viewCount, body, ownerUserId, lastDate, title, tags, ansCount, comCount, license);
+                resultado = new MongoDoc(id, postTpeId, acceptedAnswerId, cDate, score, viewCount, body, ownerUserId, lastDate, title, tags, ansCount, comCount, license);
                 listaRes.add(resultado);
                 attributes.clear();
             }
@@ -103,7 +129,7 @@ public class DocManager {
             PR32CreateMain.logger.info("Read Correctly");
             System.out.println("Read Correctly");
         } catch (Exception e) {
-            PR32CreateMain.logger.error("An error ocurred: " + e.getMessage());
+            PR32CreateMain.logger.warning("An error ocurred: " + e.getMessage());
             System.out.println("An error ocurred: " + e.getMessage());
             return null;
         }
@@ -121,7 +147,7 @@ public class DocManager {
             org.w3c.dom.Document result = builder.parse(new InputSource(url));
             return result;
         } catch (Exception e) {
-            PR32CreateMain.logger.error("An error ocurred: " + e.getMessage());
+            PR32CreateMain.logger.warning("An error ocurred: " + e.getMessage());
             System.out.println("An error ocurred: " + e.getMessage());
         }
         return null;
